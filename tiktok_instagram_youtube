@@ -1,0 +1,325 @@
+{
+  "name": "POSTAGEM TIKTOK AUTOMATICA",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## https://www.youtube.com/watch?v=y4fVRHgARzI"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -16,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "5ab64c02-1e7a-4cb7-b66d-9954f2723943",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1Kn1ub9NcLdKFhuA9P-eHT4KCYkFoRte1",
+          "mode": "id"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b092a819-699b-4deb-8b6e-0efdf04a480a",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "z0kYms3IIDQWAD2S",
+          "name": "Google Drive Nando"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "fc9d1776-5a2b-4ad1-b9a1-10c99dda3e1f",
+      "name": "Baixar_video",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "z0kYms3IIDQWAD2S",
+          "name": "Google Drive Nando"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://tmpfiles.org/api/v1/upload",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "932f7e42-a505-4cce-a991-89c4a52a85c9",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const url = $input.first().json.data.url;\n\nconst match = url.match(/tmpfiles\\.org\\/(\\d+)\\/([^/?#]+)/);\n\nif (match && match[1] && match[2]) {\n  return [\n    {\n      json: {\n        fileNumber: match[1],\n        fileName: match[2]\n      }\n    }\n  ]\n} else {\n  throw new Error(\"Could not extract file number or file name from URL\");\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "5c914845-8cad-44f4-ac55-ec4bfac6bae6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "66990915-6ed0-43db-8eff-a23c26c68c82",
+              "name": "Lind",
+              "value": "=http://tmpfiles.org/dl/{{ $json.fileNumber }}/{{ $json.fileName }}",
+              "type": "string"
+            },
+            {
+              "id": "74cf6ecb-cb12-4d2e-b097-f1e149c495a2",
+              "name": "Name",
+              "value": "Demo Free Poster",
+              "type": "string"
+            },
+            {
+              "id": "333e4407-8f36-4f4a-8197-b0d5347f6eb5",
+              "name": "Captions",
+              "value": "This is good workflow",
+              "type": "string"
+            },
+            {
+              "id": "fdae256c-1a15-46db-867b-3b797e1509f6",
+              "name": "Publish",
+              "value": "Go",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        208
+      ],
+      "id": "8860d33c-2067-4502-9194-493252ad1277",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ai192077jWvyQpczwM0NQgLp26XraCmfwKftsesx8_o",
+          "mode": "list",
+          "cachedResultName": "Free Short Form Poster",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ai192077jWvyQpczwM0NQgLp26XraCmfwKftsesx8_o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ai192077jWvyQpczwM0NQgLp26XraCmfwKftsesx8_o/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Publish": "={{ $json.Publish }}",
+            "Caption": "={{ $json.Captions }}",
+            "Link": "={{ $json.Lind }}",
+            "Tttle": "={{ $json.Name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tttle",
+              "displayName": "Tttle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Caption",
+              "displayName": "Caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Publish",
+              "displayName": "Publish",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        208
+      ],
+      "id": "0916836e-002d-47c6-b968-f9d89a7b2b79",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "f0hg9DERtsRZETQ9",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## POSTAGENS AUTOMATICAS REDES SOCIAIS",
+        "height": 416,
+        "width": 1024,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -32,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "a4dc7590-00dd-47c9-80fe-88f1a1c51085",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Baixar_video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baixar_video": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a81c6288-5b45-4757-af7f-1ff5f10f2c4c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "51ec8b13dcbf144ca4f84c354a83778b0deb1106e3615dc3e4f21105dfa59e92"
+  },
+  "id": "utf89dS6sVvd63Y9",
+  "tags": []
+}
